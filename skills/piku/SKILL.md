@@ -1,33 +1,33 @@
 ---
-name: pixyard
-description: Generate and edit images with the pixyard API or its MCP server: auth, endpoints, polling, text-in-image tips. Use when an agent needs a picture or a photo edit.
+name: piku
+description: Generate and edit images with the Piku API or its MCP server: auth, endpoints, polling, text-in-image tips. Use when an agent needs a picture or a photo edit.
 ---
 
-# pixyard
+# Piku
 
-pixyard makes a picture from a prompt, or edits a photo from one sentence. Use it through the HTTP API with a
+Piku makes a picture from a prompt, or edits a photo from one sentence. Use it through the HTTP API with a
 key, or through its MCP server when your client supports remote MCP.
 
 ## Two ways in
 
 | Way | When | Auth |
 |---|---|---|
-| MCP server `https://pixyard.resources-f3c.workers.dev/mcp` | Your agent speaks MCP (Claude Code, Codex, Cursor, VS Code, ChatGPT, Claude) | OAuth sign-in, or `Authorization: Bearer px_…` |
-| HTTP API `https://pixyard.resources-f3c.workers.dev/v1` | Scripts, back ends, anything else | `Authorization: Bearer px_…` |
+| MCP server `https://piku.dv4.ai/mcp` | Your agent speaks MCP (Claude Code, Codex, Cursor, VS Code, ChatGPT, Claude) | OAuth sign-in, or `Authorization: Bearer piku_…` |
+| HTTP API `https://piku.dv4.ai/v1` | Scripts, back ends, anything else | `Authorization: Bearer piku_…` |
 
-Get a key: sign in at https://pixyard.resources-f3c.workers.dev/login (a new email gets an account), then create one on the API keys page.
-Keep it in an environment variable (`PIXYARD_API_KEY`); never print it or commit it.
+Get a key: sign in at https://piku.dv4.ai/login (a new email gets an account), then create one on the API keys page.
+Keep it in an environment variable (`PIKU_API_KEY`); never print it or commit it.
 
 ### MCP
 
 Claude Code:
 
 ```sh
-claude mcp add --transport http pixyard https://pixyard.resources-f3c.workers.dev/mcp
+claude mcp add --transport http piku https://piku.dv4.ai/mcp
 ```
 
-Then run `/mcp` in Claude Code and sign in. Codex: `codex mcp add pixyard --url <address>` then
-`codex mcp login pixyard`. Other clients: https://pixyard.resources-f3c.workers.dev/assistants.
+Then run `/mcp` in Claude Code and sign in. Codex: `codex mcp add piku --url <address>` then
+`codex mcp login piku`. Other clients: https://piku.dv4.ai/assistants.
 
 Tools:
 
@@ -39,7 +39,7 @@ Tools:
 
 ## HTTP API
 
-Base: `https://pixyard.resources-f3c.workers.dev/v1`. JSON in, JSON out.
+Base: `https://piku.dv4.ai/v1`. JSON in, JSON out.
 
 Models:
 
@@ -54,8 +54,8 @@ Models:
    request after a network error.
 
    ```sh
-   curl -s https://pixyard.resources-f3c.workers.dev/v1/generations \
-     -H "Authorization: Bearer $PIXYARD_API_KEY" \
+   curl -s https://piku.dv4.ai/v1/generations \
+     -H "Authorization: Bearer $PIKU_API_KEY" \
      -H "Content-Type: application/json" \
      -H "Idempotency-Key: $(uuidgen)" \
      -d '{"model": "qwen-image/text-to-image", "prompt": "A ceramic mug on a wooden desk, morning light", "aspect_ratio": "16:9"}'
@@ -67,8 +67,8 @@ Models:
    answers as soon as the run ends, or after 10 seconds with the run still going.
 
    ```sh
-   curl -s "https://pixyard.resources-f3c.workers.dev/v1/generations/$ID?wait=10" \
-     -H "Authorization: Bearer $PIXYARD_API_KEY"
+   curl -s "https://piku.dv4.ai/v1/generations/$ID?wait=10" \
+     -H "Authorization: Bearer $PIKU_API_KEY"
    ```
 
    When `done`, download `result.image_url` (a signed link, no key needed, valid 15 minutes). `result` also has
@@ -98,12 +98,12 @@ The first picture after a quiet spell takes longer while a GPU worker starts; ke
 
 ```sh
 SIZE=$(wc -c < photo.jpg | tr -d ' ')
-UP=$(curl -s https://pixyard.resources-f3c.workers.dev/v1/uploads \
-  -H "Authorization: Bearer $PIXYARD_API_KEY" -H "Content-Type: application/json" \
+UP=$(curl -s https://piku.dv4.ai/v1/uploads \
+  -H "Authorization: Bearer $PIKU_API_KEY" -H "Content-Type: application/json" \
   -d "{\"kind\": \"image\", \"mime\": \"image/jpeg\", \"bytes\": $SIZE, \"filename\": \"photo.jpg\"}")
 curl -s -X PUT "$(echo "$UP" | jq -r .upload_url)" -H "Content-Type: image/jpeg" --data-binary @photo.jpg
-curl -s https://pixyard.resources-f3c.workers.dev/v1/generations \
-  -H "Authorization: Bearer $PIXYARD_API_KEY" -H "Content-Type: application/json" \
+curl -s https://piku.dv4.ai/v1/generations \
+  -H "Authorization: Bearer $PIKU_API_KEY" -H "Content-Type: application/json" \
   -H "Idempotency-Key: $(uuidgen)" \
   -d "{\"model\": \"qwen-image/edit\", \"prompt\": \"Put the bottle on a beach at sunset\", \"image\": \"$(echo "$UP" | jq -r .asset_id)\"}"
 ```
@@ -137,7 +137,7 @@ Every error has one shape: `{"error": {"type", "message", "field", "retry_after_
 
 ## Checklist for an agent
 
-1. Key in `PIXYARD_API_KEY`, or MCP connected.
+1. Key in `PIKU_API_KEY`, or MCP connected.
 2. New `Idempotency-Key` per picture.
 3. Poll with `?wait=10`, never a tight loop.
 4. Download `result.image_url` within 15 minutes.

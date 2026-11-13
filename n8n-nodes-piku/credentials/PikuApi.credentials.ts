@@ -6,15 +6,15 @@ import type {
 	INodeProperties,
 } from 'n8n-workflow';
 
-export class PixyardApi implements ICredentialType {
-	name = 'pixyardApi';
+export class PikuApi implements ICredentialType {
+	name = 'pikuApi';
 
-	displayName = 'pixyard API';
+	displayName = 'Piku API';
 
-	icon: Icon = { light: 'file:../icons/pixyard.svg', dark: 'file:../icons/pixyard.dark.svg' };
+	icon: Icon = { light: 'file:../icons/piku.svg', dark: 'file:../icons/piku.dark.svg' };
 
 	documentationUrl =
-		'https://github.com/saaivignesh20/pixyard-integrations/tree/main/n8n-nodes-pixyard#credentials';
+		'https://github.com/saaivignesh20/piku-integrations/tree/main/n8n-nodes-piku#credentials';
 
 	properties: INodeProperties[] = [
 		{
@@ -25,7 +25,7 @@ export class PixyardApi implements ICredentialType {
 			required: true,
 			default: '',
 			description:
-				'A pixyard API key (starts with px_). Create one on the API keys page after signing in.',
+				'A Piku API key (starts with piku_). Create one on the API keys page after signing in.',
 		},
 	];
 
@@ -41,7 +41,7 @@ export class PixyardApi implements ICredentialType {
 	// GET /v1/models is public, so it would pass with any key; listing one generation needs a valid key.
 	test: ICredentialTestRequest = {
 		request: {
-			baseURL: 'https://pixyard.resources-f3c.workers.dev',
+			baseURL: 'https://piku.dv4.ai',
 			url: '/v1/generations',
 			method: 'GET',
 			qs: { limit: 1 },

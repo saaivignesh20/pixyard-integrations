@@ -1,13 +1,13 @@
-# Publishes n8n-nodes-pixyard to npm with a provenance statement. Based on the n8n node starter's publish.yml
+# Publishes n8n-nodes-piku to npm with a provenance statement. Based on the n8n node starter's publish.yml
 # (@n8n/node-cli >= 0.23.0): inside GitHub Actions, `npm run release` runs lint and build, then `npm publish` with
 # NPM_CONFIG_PROVENANCE=true. n8n requires community nodes to be published this way from May 1 2026.
 #
 # One-time setup on npmjs.com (recommended, no secret): the package's settings -> Trusted Publishers -> GitHub Actions,
-# owner saaivignesh20, repository pixyard-integrations, workflow publish.yml. Fallback: a granular npm token with
+# owner saaivignesh20, repository piku-integrations, workflow publish.yml. Fallback: a granular npm token with
 # publish rights as the repository secret NPM_TOKEN.
 #
-# Run it with `gh workflow run publish.yml -R saaivignesh20/pixyard-integrations`, or push a tag n8n-v0.1.0.
-# The version published is the one in n8n-nodes-pixyard/package.json.
+# Run it with `gh workflow run publish.yml -R saaivignesh20/piku-integrations`, or push a tag n8n-v0.1.0.
+# The version published is the one in n8n-nodes-piku/package.json.
 
 name: Publish
 
@@ -29,7 +29,7 @@ jobs:
 
     defaults:
       run:
-        working-directory: n8n-nodes-pixyard
+        working-directory: n8n-nodes-piku
 
     steps:
       - uses: actions/checkout@v4

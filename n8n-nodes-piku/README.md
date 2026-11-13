@@ -1,19 +1,20 @@
-# n8n-nodes-pixyard
+# n8n-nodes-piku
 
-An [n8n](https://n8n.io) community node for [pixyard](https://pixyard.resources-f3c.workers.dev): make a
+An [n8n](https://n8n.io) community node for [Piku](https://piku.dv4.ai): make a
 picture from a prompt, or edit a photo with one sentence. The node also works as a tool for n8n's AI Agent.
+Piku is the API platform for [DV4](https://dv4.ai).
 
 ## Install
 
-In n8n: **Settings → Community Nodes → Install**, then enter `n8n-nodes-pixyard`.
-Self-hosted with npm: `npm install n8n-nodes-pixyard` in your n8n custom nodes folder
+In n8n: **Settings → Community Nodes → Install**, then enter `n8n-nodes-piku`.
+Self-hosted with npm: `npm install n8n-nodes-piku` in your n8n custom nodes folder
 (see [n8n's guide](https://docs.n8n.io/integrations/community-nodes/installation/)).
 
 ## Credentials
 
-1. Sign in at https://pixyard.resources-f3c.workers.dev/login (a new email gets an account).
-2. Create a key on the API keys page. It starts with `px_` and shows once.
-3. In n8n, add a **pixyard API** credential and paste the key. n8n checks it by listing one of your generations.
+1. Sign in at https://piku.dv4.ai/login (a new email gets an account).
+2. Create a key on the API keys page. It starts with `piku_` and shows once.
+3. In n8n, add a **Piku API** credential and paste the key. n8n checks it by listing one of your generations.
 
 ## Operations
 

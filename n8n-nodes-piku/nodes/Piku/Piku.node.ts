@@ -17,7 +17,7 @@ import {
 	sleep,
 } from 'n8n-workflow';
 
-const BASE_URL = 'https://pixyard.resources-f3c.workers.dev';
+const BASE_URL = 'https://piku.dv4.ai';
 const MODEL_GENERATE = 'qwen-image/text-to-image';
 const MODEL_EDIT = 'qwen-image/edit';
 const TERMINAL = ['done', 'failed', 'cancelled'];
@@ -61,7 +61,7 @@ async function api<T>(
 	};
 	return (await ctx.helpers.httpRequestWithAuthentication.call(
 		ctx,
-		'pixyardApi',
+		'pikuApi',
 		options,
 	)) as T;
 }
@@ -135,7 +135,7 @@ async function upload(ctx: IExecuteFunctions, itemIndex: number, field: string):
 	if (!UPLOAD_MIMES.includes(binary.mimeType)) {
 		throw new NodeOperationError(
 			ctx.getNode(),
-			`The file in "${field}" is ${binary.mimeType}; pixyard edits JPEG, PNG or WebP pictures.`,
+			`The file in "${field}" is ${binary.mimeType}; Piku edits JPEG, PNG or WebP pictures.`,
 			{ itemIndex },
 		);
 	}
@@ -153,7 +153,7 @@ async function upload(ctx: IExecuteFunctions, itemIndex: number, field: string):
 	return up.asset_id;
 }
 
-/** The pixyard error body's message ({"error": {"type", "message", ...}}), when the HTTP error carries one. */
+/** The Piku error body's message ({"error": {"type", "message", ...}}), when the HTTP error carries one. */
 function apiMessage(error: unknown): string | undefined {
 	const response = (error as { response?: { body?: unknown; data?: unknown } } | undefined)?.response;
 	for (const raw of [response?.body, response?.data]) {
@@ -164,24 +164,24 @@ function apiMessage(error: unknown): string | undefined {
 	return undefined;
 }
 
-export class Pixyard implements INodeType {
+export class Piku implements INodeType {
 	description: INodeTypeDescription = {
-		displayName: 'pixyard',
-		name: 'pixyard',
-		icon: { light: 'file:../../icons/pixyard.svg', dark: 'file:../../icons/pixyard.dark.svg' },
+		displayName: 'Piku',
+		name: 'piku',
+		icon: { light: 'file:../../icons/piku.svg', dark: 'file:../../icons/piku.dark.svg' },
 		group: ['transform'],
 		version: 1,
 		subtitle: '={{$parameter["operation"]}}',
 		description: 'Generate images from a prompt and edit photos with one sentence',
 		defaults: {
-			name: 'pixyard',
+			name: 'piku',
 		},
 		usableAsTool: true,
 		inputs: [NodeConnectionTypes.Main],
 		outputs: [NodeConnectionTypes.Main],
 		credentials: [
 			{
-				name: 'pixyardApi',
+				name: 'pikuApi',
 				required: true,
 			},
 		],
@@ -239,9 +239,9 @@ export class Pixyard implements INodeType {
 				name: 'aspectRatio',
 				type: 'options',
 				options: [
-					{ name: 'Landscape 16:9 (1664×928; edits 1280×720)', value: '16:9' },
-					{ name: 'Portrait 9:16 (928×1664; edits 720×1280)', value: '9:16' },
-					{ name: 'Square 1:1 (1328×1328; edits 1024×1024)', value: '1:1' },
+					{ name: 'Landscape 16:9 (1664×928; Edits 1280×720)', value: '16:9' },
+					{ name: 'Portrait 9:16 (928×1664; Edits 720×1280)', value: '9:16' },
+					{ name: 'Square 1:1 (1328×1328; Edits 1024×1024)', value: '1:1' },
 				],
 				default: '1:1',
 				description: "The picture's shape",

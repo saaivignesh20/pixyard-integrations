@@ -1,0 +1,18 @@
+{
+	"node": "n8n-nodes-piku",
+	"nodeVersion": "1.0",
+	"codexVersion": "1.0",
+	"categories": ["Marketing & Content", "Development"],
+	"resources": {
+		"credentialDocumentation": [
+			{
+				"url": "https://github.com/saaivignesh20/piku-integrations/tree/main/n8n-nodes-piku#credentials"
+			}
+		],
+		"primaryDocumentation": [
+			{
+				"url": "https://github.com/saaivignesh20/piku-integrations/tree/main/n8n-nodes-piku"
+			}
+		]
+	}
+}
