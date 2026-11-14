@@ -142,7 +142,7 @@ included on every account. Time in line is not billed.
 
 `GET /v1/live/sessions` lists the account's 20 newest sessions with `included_seconds_left`. A session's time limit
 (`max_s`) is the included time left plus what the balance pays for, at most 30 minutes. A ready session's
-`join_url` looks like `https://live.piku.dv4.ai/<id>/`.
+`join_url` looks like `https://live.piku.dv4.ai/live/<id>/`.
 
 | Status and type | What to do |
 |---|---|
