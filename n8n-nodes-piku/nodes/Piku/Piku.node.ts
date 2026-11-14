@@ -255,7 +255,7 @@ export class Piku implements INodeType {
 						name: 'Start Live Avatar Session',
 						value: 'startLiveSession',
 						description:
-							'Start a real-time talking AI avatar session to open in a browser. One session at a time across Piku, so it may wait in line. $0.10 per minute, billed by the second; the first 10 minutes per account are free.',
+							'Start a real-time talking AI avatar session to open in a browser. One session at a time across Piku, so it may wait in line. $0.10 per minute, billed by the second; 10 minutes included on every account.',
 						action: 'Start a live avatar session',
 					},
 				],
@@ -306,7 +306,7 @@ export class Piku implements INodeType {
 			},
 			{
 				displayName:
-					'Live Avatar is a real-time talking AI avatar ("Aria" unless you name it) that runs in a web browser. It runs one session at a time across all of Piku: when it is busy the session is "queued"; run Get Live Avatar Session again after retry_after_s seconds until status is "ready" and join_url is set. Open join_url in a browser within 5 minutes (before expires_at) and allow the microphone to talk. $0.10 per minute, billed by the second from your credit; the first 10 minutes per account are free. The avatar tells people it is an AI avatar. Anyone with join_url can open the session, so share it only with the person who should talk.',
+					'Live Avatar is a real-time talking AI avatar ("Aria" unless you name it) that runs in a web browser. It runs one session at a time across all of Piku: when it is busy the session is "queued"; run Get Live Avatar Session again after retry_after_s seconds until status is "ready" and join_url is set. Open join_url in a browser within 5 minutes (before expires_at) and allow the microphone to talk. $0.10 per minute, billed by the second from your credit; 10 minutes are included on every account. The avatar tells people it is an AI avatar. Anyone with join_url can open the session, so share it only with the person who should talk.',
 				name: 'liveNotice',
 				type: 'notice',
 				default: '',
@@ -328,7 +328,7 @@ export class Piku implements INodeType {
 						type: 'string',
 						typeOptions: { rows: 2 },
 						default: '',
-						placeholder: 'Hi! Ask me anything about our kites.',
+						placeholder: 'Hi. Ask me anything about our kites.',
 						description: 'The first thing the avatar says. Up to 300 characters.',
 					},
 					{

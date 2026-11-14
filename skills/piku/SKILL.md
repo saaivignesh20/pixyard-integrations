@@ -117,8 +117,8 @@ Uploads take JPEG, PNG or WebP, at most 7 MiB, checked by the file's first bytes
 
 A talking AI avatar ("Aria" by default) that runs in a web browser: the person opens a link, allows the microphone
 and talks with it. It runs one session at a time across all of Piku, so a session may wait in line. It tells people
-it is an AI avatar. $0.10 per minute, billed by the second from the account's credit; the first 10 minutes (600
-seconds) per account are free. Time in line is not billed.
+it is an AI avatar. $0.10 per minute, billed by the second from the account's credit; 10 minutes (600 seconds) are
+included on every account. Time in line is not billed.
 
 1. Create: `POST /v1/live/sessions` with `{"persona": {...}}` or `{}`. The answer is `201` with `id` and `status`.
    Persona fields, all optional text: `name` (up to 40 characters), `maker` (60), `greeting` (300), `instructions`
@@ -127,7 +127,7 @@ seconds) per account are free. Time in line is not billed.
    ```sh
    curl -s https://piku.dv4.ai/v1/live/sessions \
      -H "Authorization: Bearer $PIKU_API_KEY" -H "Content-Type: application/json" \
-     -d '{"persona": {"name": "Mira", "greeting": "Hi! Ask me anything about our kites.", "instructions": "Be warm and brief."}}'
+     -d '{"persona": {"name": "Mira", "greeting": "Hi. Ask me anything about our kites.", "instructions": "Be warm and brief."}}'
    ```
 
 2. Poll: while `status` is `queued`, wait `retry_after_s` seconds (5 to 60), then `GET /v1/live/sessions/{id}`.
@@ -140,12 +140,13 @@ seconds) per account are free. Time in line is not billed.
    `price_usd`. If the answer has `end_requested: true` and is still `live`, the avatar wasn't reached: send the end
    again.
 
-`GET /v1/live/sessions` lists the account's 20 newest sessions with `free_seconds_left`. A session's time limit
-(`max_s`) is the free seconds left plus what the balance pays for, at most 30 minutes.
+`GET /v1/live/sessions` lists the account's 20 newest sessions with `included_seconds_left`. A session's time limit
+(`max_s`) is the included time left plus what the balance pays for, at most 30 minutes. A ready session's
+`join_url` looks like `https://live.piku.dv4.ai/<id>/`.
 
 | Status and type | What to do |
 |---|---|
-| `402 insufficient_credit` | The free minutes are used and the balance is under $0.10 (one minute). Tell the user to add credit on Billing; do not retry until they have. |
+| `402 insufficient_credit` | The included minutes are used and the balance is under $0.10 (one minute). Tell the user to add credit on Billing; do not retry until they have. |
 | `409 live_session_active` | The account already has a queued, ready or live session. Use that one, end it, or let it finish. |
 | `429 queue_full` | The line (20 sessions across Piku) is full. Retry after `retry_after_s`. |
 | `503 unavailable` | Live Avatar isn't available right now. Retry later. |
