@@ -1,12 +1,12 @@
 # Piku integrations
 
-Ways to use [Piku](https://piku.dv4.ai) (image generation and photo editing) from
+Ways to use [Piku](https://piku.dv4.ai) (image generation, photo editing and Live Avatar) from
 agents and automation tools. Piku is the API platform for [DV4](https://dv4.ai).
 
 | Folder | What it is |
 |---|---|
-| [`skills/piku`](skills/piku/SKILL.md) | An agent skill: the API, the MCP server, polling and text-in-picture tips |
-| [`n8n-nodes-piku`](n8n-nodes-piku) | An n8n community node: Generate Image, Edit Image, Get Generation |
+| [`skills/piku`](skills/piku/SKILL.md) | An agent skill: the API, the MCP server, polling, text-in-picture tips and Live Avatar |
+| [`n8n-nodes-piku`](n8n-nodes-piku) | An n8n community node: Generate Image, Edit Image, Get Generation, Start/Get/End Live Avatar Session |
 
 ## Agent skill
 
@@ -40,6 +40,8 @@ the API keys page. Each picture's price comes off your credit.
 ## Changelog
 
 - 2026-11-13: renamed to Piku; it was called pixyard until 2026-11-13.
+- 2026-11-13: Live Avatar (a real-time talking AI avatar in the browser) in the skill and the n8n node: Start, Get and
+  End Live Avatar Session.
 
 ## Licence
 

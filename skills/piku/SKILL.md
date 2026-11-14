@@ -1,12 +1,13 @@
 ---
 name: piku
-description: Generate and edit images with the Piku API or its MCP server: auth, endpoints, polling, text-in-image tips. Use when an agent needs a picture or a photo edit.
+description: Generate and edit images, and start Live Avatar sessions (a real-time talking AI avatar in the browser), with the Piku API or its MCP server: auth, endpoints, polling, text-in-image tips. Use when an agent needs a picture, a photo edit or a talking avatar.
 ---
 
 # Piku
 
-Piku makes a picture from a prompt, or edits a photo from one sentence. Use it through the HTTP API with a
-key, or through its MCP server when your client supports remote MCP.
+Piku makes a picture from a prompt, edits a photo from one sentence, and runs Live Avatar, a real-time talking AI
+avatar in the browser. Use it through the HTTP API with a key, or through its MCP server when your client supports
+remote MCP.
 
 ## Two ways in
 
@@ -36,6 +37,8 @@ Tools:
 - `edit_image` `{prompt, image_url, aspect_ratio?, seed?}`: `image_url` is a public https link to a JPEG, PNG or WebP
   of at most 7 MiB.
 - `get_generation` `{id}`: when a call answers "Still running", ask again with its id.
+- `create_live_session` `{persona?}`: starts a Live Avatar session; gives its `join_url`, or its place in line.
+- `get_live_session` `{id}`: the session now; ask again while it is queued.
 
 ## HTTP API
 
@@ -110,6 +113,43 @@ curl -s https://piku.dv4.ai/v1/generations \
 
 Uploads take JPEG, PNG or WebP, at most 7 MiB, checked by the file's first bytes.
 
+## Live Avatar
+
+A talking AI avatar ("Aria" by default) that runs in a web browser: the person opens a link, allows the microphone
+and talks with it. It runs one session at a time across all of Piku, so a session may wait in line. It tells people
+it is an AI avatar. $0.10 per minute, billed by the second from the account's credit; the first 10 minutes (600
+seconds) per account are free. Time in line is not billed.
+
+1. Create: `POST /v1/live/sessions` with `{"persona": {...}}` or `{}`. The answer is `201` with `id` and `status`.
+   Persona fields, all optional text: `name` (up to 40 characters), `maker` (60), `greeting` (300), `instructions`
+   (4,000), `knowledge` (12,000). No other fields.
+
+   ```sh
+   curl -s https://piku.dv4.ai/v1/live/sessions \
+     -H "Authorization: Bearer $PIKU_API_KEY" -H "Content-Type: application/json" \
+     -d '{"persona": {"name": "Mira", "greeting": "Hi! Ask me anything about our kites.", "instructions": "Be warm and brief."}}'
+   ```
+
+2. Poll: while `status` is `queued`, wait `retry_after_s` seconds (5 to 60), then `GET /v1/live/sessions/{id}`.
+   `queue_position` is the place in line (1 is next). The line only moves when sessions are read, so keep asking.
+3. Open: when `status` is `ready`, give the user `join_url` to open in a browser before `expires_at` (5 minutes),
+   else it `expired`. Anyone with the link can join; share it only with the person who should talk. The session is
+   `live` once the call starts.
+4. End: closing the tab ends the call, or `POST /v1/live/sessions/{id}/end` (queued or ready: `cancelled`, nothing
+   charged; live: stopped now and billed to that moment). Read it again for `status: "ended"`, `seconds` and
+   `price_usd`. If the answer has `end_requested: true` and is still `live`, the avatar wasn't reached: send the end
+   again.
+
+`GET /v1/live/sessions` lists the account's 20 newest sessions with `free_seconds_left`. A session's time limit
+(`max_s`) is the free seconds left plus what the balance pays for, at most 30 minutes.
+
+| Status and type | What to do |
+|---|---|
+| `402 insufficient_credit` | The free minutes are used and the balance is under $0.10 (one minute). Tell the user to add credit on Billing; do not retry until they have. |
+| `409 live_session_active` | The account already has a queued, ready or live session. Use that one, end it, or let it finish. |
+| `429 queue_full` | The line (20 sessions across Piku) is full. Retry after `retry_after_s`. |
+| `503 unavailable` | Live Avatar isn't available right now. Retry later. |
+
 ## Text in pictures
 
 Pictures with printed words (labels, signs, packaging, posters, screens) come out readable when the prompt gives the
@@ -143,3 +183,5 @@ Every error has one shape: `{"error": {"type", "message", "field", "retry_after_
 4. Download `result.image_url` within 15 minutes.
 5. Quote the words you want printed.
 6. On `402 insufficient_credit`, stop and tell the user to add credit.
+7. Live Avatar: one session per account; poll a queued session after `retry_after_s`; hand the user `join_url` within
+   5 minutes.
