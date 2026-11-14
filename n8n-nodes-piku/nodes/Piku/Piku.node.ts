@@ -24,6 +24,10 @@ const TERMINAL = ['done', 'failed', 'cancelled'];
 const MAX_WAIT_MS = 120_000;
 const UPLOAD_MIMES = ['image/jpeg', 'image/png', 'image/webp'];
 const EXTENSION: Record<string, string> = { png: 'png', jpeg: 'jpg', webp: 'webp' };
+const IMAGE_OPERATIONS = ['generateImage', 'editImage', 'getGeneration'];
+const LIVE_SESSION_OPERATIONS = ['getLiveSession', 'endLiveSession'];
+/** The persona fields POST /v1/live/sessions takes; the API trims them and checks their lengths */
+const PERSONA_FIELDS = ['name', 'maker', 'greeting', 'instructions', 'knowledge'];
 
 interface Generation extends IDataObject {
 	id: string;
@@ -172,7 +176,8 @@ export class Piku implements INodeType {
 		group: ['transform'],
 		version: 1,
 		subtitle: '={{$parameter["operation"]}}',
-		description: 'Generate images from a prompt and edit photos with one sentence',
+		description:
+			'Generate images from a prompt, edit photos with one sentence, and start Live Avatar sessions',
 		defaults: {
 			name: 'piku',
 		},
@@ -187,10 +192,22 @@ export class Piku implements INodeType {
 		],
 		properties: [
 			{
+				displayName: 'Resource',
+				name: 'resource',
+				type: 'options',
+				noDataExpression: true,
+				options: [
+					{ name: 'Image', value: 'image' },
+					{ name: 'Live Avatar', value: 'liveAvatar' },
+				],
+				default: 'image',
+			},
+			{
 				displayName: 'Operation',
 				name: 'operation',
 				type: 'options',
 				noDataExpression: true,
+				displayOptions: { show: { resource: ['image'] } },
 				options: [
 					{
 						name: 'Edit Image',
@@ -212,6 +229,37 @@ export class Piku implements INodeType {
 					},
 				],
 				default: 'generateImage',
+			},
+			{
+				displayName: 'Operation',
+				name: 'operation',
+				type: 'options',
+				noDataExpression: true,
+				displayOptions: { show: { resource: ['liveAvatar'] } },
+				options: [
+					{
+						name: 'End Live Avatar Session',
+						value: 'endLiveSession',
+						description:
+							'End a Live Avatar session. A queued or ready one is cancelled at no charge; a live call is stopped and billed up to that moment.',
+						action: 'End a live avatar session',
+					},
+					{
+						name: 'Get Live Avatar Session',
+						value: 'getLiveSession',
+						description:
+							'Get a Live Avatar session by its ID: its place in line, its join_url once it is its turn, or how it ended',
+						action: 'Get a live avatar session',
+					},
+					{
+						name: 'Start Live Avatar Session',
+						value: 'startLiveSession',
+						description:
+							'Start a real-time talking AI avatar session to open in a browser. One session at a time across Piku, so it may wait in line. $0.10 per minute, billed by the second; the first 10 minutes per account are free.',
+						action: 'Start a live avatar session',
+					},
+				],
+				default: 'startLiveSession',
 			},
 			{
 				displayName: 'Prompt',
@@ -257,11 +305,83 @@ export class Piku implements INodeType {
 				displayOptions: { show: { operation: ['getGeneration'] } },
 			},
 			{
+				displayName:
+					'Live Avatar is a real-time talking AI avatar ("Aria" unless you name it) that runs in a web browser. It runs one session at a time across all of Piku: when it is busy the session is "queued"; run Get Live Avatar Session again after retry_after_s seconds until status is "ready" and join_url is set. Open join_url in a browser within 5 minutes (before expires_at) and allow the microphone to talk. $0.10 per minute, billed by the second from your credit; the first 10 minutes per account are free. The avatar tells people it is an AI avatar. Anyone with join_url can open the session, so share it only with the person who should talk.',
+				name: 'liveNotice',
+				type: 'notice',
+				default: '',
+				displayOptions: { show: { operation: ['startLiveSession'] } },
+			},
+			{
+				displayName: 'Persona',
+				name: 'persona',
+				type: 'collection',
+				placeholder: 'Add persona field',
+				default: {},
+				description:
+					'Who the avatar is. Every field is optional; leave them all out for the default avatar, Aria. Fixed when the session starts.',
+				displayOptions: { show: { operation: ['startLiveSession'] } },
+				options: [
+					{
+						displayName: 'Greeting',
+						name: 'greeting',
+						type: 'string',
+						typeOptions: { rows: 2 },
+						default: '',
+						placeholder: 'Hi! Ask me anything about our kites.',
+						description: 'The first thing the avatar says. Up to 300 characters.',
+					},
+					{
+						displayName: 'Instructions',
+						name: 'instructions',
+						type: 'string',
+						typeOptions: { rows: 4 },
+						default: '',
+						placeholder: 'Be warm and brief.',
+						description: 'How the avatar behaves and what it talks about. Up to 4,000 characters.',
+					},
+					{
+						displayName: 'Knowledge',
+						name: 'knowledge',
+						type: 'string',
+						typeOptions: { rows: 6 },
+						default: '',
+						placeholder: 'We sell three kites: Delta ($40), Box ($55) and Stunt ($90).',
+						description: 'Facts the avatar can draw on. Up to 12,000 characters.',
+					},
+					{
+						displayName: 'Maker',
+						name: 'maker',
+						type: 'string',
+						default: '',
+						description: 'Who the avatar says made it. Up to 60 characters.',
+					},
+					{
+						displayName: 'Name',
+						name: 'name',
+						type: 'string',
+						default: '',
+						placeholder: 'Mira',
+						description: 'The name the avatar goes by. Up to 40 characters.',
+					},
+				],
+			},
+			{
+				displayName: 'Session ID',
+				name: 'sessionId',
+				type: 'string',
+				required: true,
+				default: '',
+				description: 'The ID returned by Start Live Avatar Session',
+				displayOptions: { show: { operation: LIVE_SESSION_OPERATIONS } },
+			},
+			{
 				displayName: 'Options',
 				name: 'options',
 				type: 'collection',
 				placeholder: 'Add option',
 				default: {},
+				displayOptions: { show: { operation: IMAGE_OPERATIONS } },
 				options: [
 					{
 						displayName: 'Download Image',
@@ -312,6 +432,27 @@ export class Piku implements INodeType {
 		for (let i = 0; i < items.length; i++) {
 			try {
 				const operation = this.getNodeParameter('operation', i) as string;
+				if (operation === 'startLiveSession') {
+					const fields = this.getNodeParameter('persona', i, {}) as Record<string, string>;
+					const persona: IDataObject = {};
+					for (const key of PERSONA_FIELDS) {
+						const value = fields[key]?.trim();
+						if (value) persona[key] = value;
+					}
+					const body: IDataObject = Object.keys(persona).length ? { persona } : {};
+					const session = await api<IDataObject>(this, 'POST', '/v1/live/sessions', body);
+					returnData.push({ json: session, pairedItem: { item: i } });
+					continue;
+				}
+				if (LIVE_SESSION_OPERATIONS.includes(operation)) {
+					const id = encodeURIComponent((this.getNodeParameter('sessionId', i) as string).trim());
+					const session =
+						operation === 'endLiveSession'
+							? await api<IDataObject>(this, 'POST', `/v1/live/sessions/${id}/end`, {})
+							: await api<IDataObject>(this, 'GET', `/v1/live/sessions/${id}`);
+					returnData.push({ json: session, pairedItem: { item: i } });
+					continue;
+				}
 				const options = this.getNodeParameter('options', i, {}) as Options;
 				let gen: Generation;
 				if (operation === 'getGeneration') {

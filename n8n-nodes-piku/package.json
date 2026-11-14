@@ -1,14 +1,15 @@
 {
 	"name": "n8n-nodes-piku",
 	"version": "0.1.0",
-	"description": "n8n node for Piku: generate images from a prompt and edit photos with one sentence.",
+	"description": "n8n node for Piku: generate images from a prompt, edit photos with one sentence, and start Live Avatar sessions.",
 	"license": "MIT",
 	"homepage": "https://github.com/saaivignesh20/piku-integrations/tree/main/n8n-nodes-piku",
 	"keywords": [
 		"n8n-community-node-package",
 		"piku",
 		"image-generation",
-		"image-editing"
+		"image-editing",
+		"live-avatar"
 	],
 	"author": {
 		"name": "Deep Variance Inc.",
