@@ -3,7 +3,7 @@
 An [n8n](https://n8n.io) community node for [Piku](https://piku.dv4.ai): make a
 picture from a prompt, edit a photo with one sentence, or start a Live Avatar session (a real-time talking AI avatar
 in the browser). The node also works as a tool for n8n's AI Agent.
-Piku is the API platform for [DV4](https://dv4.ai).
+Piku is the API platform of [DV4 AI](https://dv4.ai).
 
 ## Install
 

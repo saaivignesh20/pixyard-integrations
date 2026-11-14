@@ -1,7 +1,7 @@
 # Piku integrations
 
 Ways to use [Piku](https://piku.dv4.ai) (image generation, photo editing and Live Avatar) from
-agents and automation tools. Piku is the API platform for [DV4](https://dv4.ai).
+agents and automation tools. Piku is the API platform of [DV4 AI](https://dv4.ai).
 
 | Folder | What it is |
 |---|---|
