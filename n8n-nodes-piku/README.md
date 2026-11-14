@@ -26,7 +26,7 @@ Pick a **Resource** (Image or Live Avatar), then an operation.
 | Generate Image | Starts a picture from a prompt, waits up to 120 seconds for it, and puts the file in the binary field `data`. |
 | Edit Image | Uploads the picture in an input binary field (JPEG, PNG or WebP, at most 7 MiB), edits it from the prompt, waits, and returns the result the same way. |
 | Get Generation | Gets a generation by its ID, and downloads the picture when it is done. |
-| Start Live Avatar Session | Starts a Live Avatar session, with an optional persona (name, maker, greeting, instructions, knowledge), and returns it: `id`, `status`, `queue_position`, `retry_after_s`, `join_url`, `expires_at`, `price_per_minute_usd`, `free_seconds_left` and more. |
+| Start Live Avatar Session | Starts a Live Avatar session, with an optional persona (name, maker, greeting, instructions, knowledge), and returns it: `id`, `status`, `queue_position`, `retry_after_s`, `join_url`, `expires_at`, `price_per_minute_usd`, `included_seconds_left` and more. |
 | Get Live Avatar Session | Gets a Live Avatar session by its ID: its place in line, its `join_url` once it is its turn, or how it ended (`seconds`, `price_usd`). |
 | End Live Avatar Session | Ends a Live Avatar session: a queued or ready one is cancelled at no charge; a live call is stopped and billed up to that moment. |
 
@@ -59,9 +59,9 @@ Put the words you want printed in double quotes, say where they sit and how they
 Pictures are paid from the account's prepaid credit, shared by the console, API keys and assistants. When the credit
 doesn't cover a picture, the node fails with the API's `insufficient_credit` message; add credit on the Billing page.
 
-Live Avatar costs $0.10 per minute, billed by the second from the same credit; the first 10 minutes per account are
-free. Time in line, or with the page open before the call connects, is not billed. A session can't start
-(`402 insufficient_credit`) once the free minutes are used and the balance is under $0.10.
+Live Avatar costs $0.10 per minute, billed by the second from the same credit; 10 minutes are included on every
+account. Time in line, or with the page open before the call connects, is not billed. A session can't start
+(`402 insufficient_credit`) once the included minutes are used and the balance is under $0.10.
 
 ## Licence
 
